@@ -1,52 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import org.springframework.web.bind.annotation.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-@RequestMapping("/user")
+@Slf4j
+@RequestMapping("/users")
 @RestController
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private int userId = 0;
+    private final HashMap<Integer, User> users = new HashMap<>();
 
+    @ResponseStatus(value = HttpStatus.OK)
     @GetMapping
     public List<User> getUsers() {
-        return List.of(new User());
+        return new ArrayList<>(users.values());
     }
 
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping
     public User createUser(@RequestBody User user) {
         validateUserModel(user);
-        log.debug("User {} has been created", user.getName());
 
-        if (user.getName().trim().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
+
+        user.setId(++userId);
+        users.put(userId, user);
+
+        log.debug("User {} has been created", user.getName());
 
         return user;
     }
 
+    @ResponseStatus(value = HttpStatus.OK)
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        validateUserModel(user);
-        log.debug("User {} has been updated", user.getName());
+        if (!users.containsKey(user.getId())) throw new NotFoundException("User is not found");
 
-        if (user.getName().trim().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        validateUserModel(user);
+
+        users.replace(user.getId(), user);
+
+        log.debug("User {} has been updated", user.getName());
 
         return user;
     }
 
     private void validateUserModel(User user) throws ValidationException {
-        if (user.getName() == null
-                || user.getEmail() == null
+        if (user.getEmail() == null
                 || user.getBirthday() == null
                 || user.getLogin() == null
         ) {
@@ -62,7 +73,7 @@ public class UserController {
         }
 
         if (user.getLogin().trim().isEmpty()) {
-            log.warn("User login is incorrect");
+            log.warn("User login is empty");
 
             throw new ValidationException("User login is incorrect");
         }
