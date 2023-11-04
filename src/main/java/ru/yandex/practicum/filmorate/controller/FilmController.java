@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         validateFilmModel(film);
 
         film.setId(++filmId);
@@ -37,7 +38,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         if (!films.containsKey(film.getId())) throw new NotFoundException("Film is not found");
 
         validateFilmModel(film);
@@ -50,38 +51,10 @@ public class FilmController {
     }
 
     private void validateFilmModel(Film film) throws ValidationException {
-        if (film.getDuration() == 0
-                || film.getName() == null
-                || film.getDescription() == null
-                || film.getReleaseDate() == null
-        ) {
-            log.warn("Some field is null");
-
-            throw new ValidationException("Some field is null");
-        }
-
-        if (film.getName().isEmpty()) {
-            log.warn("Film name is empty");
-
-            throw new ValidationException("Film name is empty");
-        }
-
-        if (film.getDescription().length() > 200) {
-            log.warn("Film description is too long");
-
-            throw new ValidationException("Film description is too long");
-        }
-
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             log.warn("Film release date is too old");
 
             throw new ValidationException("Film release date is too old");
-        }
-
-        if (film.getDuration() < 0) {
-            log.warn("Film duration is negative");
-
-            throw new ValidationException("Film duration is negative");
         }
     }
 }
