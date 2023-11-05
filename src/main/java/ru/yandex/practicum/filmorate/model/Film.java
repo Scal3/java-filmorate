@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.validation.ReleaseDateConstraint;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class Film {
     private String description;
 
     @NotNull(message = "ReleaseDate cannot be null")
+    @ReleaseDateConstraint
     @Past(message = "ReleaseDate must be in the past")
     private LocalDate releaseDate;
 

@@ -27,8 +27,6 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        validateFilmModel(film);
-
         film.setId(++filmId);
         films.put(filmId, film);
 
@@ -41,20 +39,10 @@ public class FilmController {
     public Film updateFilm(@Valid @RequestBody Film film) {
         if (!films.containsKey(film.getId())) throw new NotFoundException("Film is not found");
 
-        validateFilmModel(film);
-
         films.replace(film.getId(), film);
 
         log.debug("Film {} has been updated", film.getName());
 
         return film;
-    }
-
-    private void validateFilmModel(Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            log.warn("Film release date is too old");
-
-            throw new ValidationException("Film release date is too old");
-        }
     }
 }
