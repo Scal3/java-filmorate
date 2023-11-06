@@ -1,4 +1,5 @@
 *.class
+*.cmd
 *.log
 *.jar
 *.war
@@ -44,3 +45,5 @@ build/
 
 *.db
 db/*
+
+mvnw
