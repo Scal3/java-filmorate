@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @AllArgsConstructor
 @Data
@@ -23,4 +24,6 @@ public class User {
     @NotNull(message = "Birthday cannot be null")
     @Past(message = "Birthday must be in the past")
     private LocalDate birthday;
+
+    private Set<User> friendsList;
 }

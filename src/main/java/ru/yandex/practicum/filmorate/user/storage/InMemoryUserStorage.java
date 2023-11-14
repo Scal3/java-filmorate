@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.user.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -13,8 +14,17 @@ public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Integer, User> users = new HashMap<>();
 
     @Override
-    public User getOne(int id) {
+    public User getOneById(int id) {
         return users.get(id);
+    }
+
+    @Override
+    public User getOneByName(String name) {
+        Optional<User> userOptional = users.values().stream()
+                .filter(user -> user.getName().equals(name))
+                .findFirst();
+
+        return userOptional.orElse(null);
     }
 
     @Override
