@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,8 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (!films.containsKey(film.getId())) throw new NotFoundException("Film is not found");
+        // TODO make it later
+//        if (!films.containsKey(film.getId())) throw new NotFoundException("Film is not found");
 
         films.replace(film.getId(), film);
 
