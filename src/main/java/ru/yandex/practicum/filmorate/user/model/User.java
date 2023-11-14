@@ -25,5 +25,5 @@ public class User {
     @Past(message = "Birthday must be in the past")
     private LocalDate birthday;
 
-    private Set<User> friendsList;
+    private Set<Integer> friendsIdList;
 }

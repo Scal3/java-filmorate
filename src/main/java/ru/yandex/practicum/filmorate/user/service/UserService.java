@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.user.model.User;
 import ru.yandex.practicum.filmorate.user.storage.UserStorage;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -28,7 +30,7 @@ public class UserService {
         return storage.getAll();
     }
 
-    public User create(User user) {
+    public void create(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -37,34 +39,100 @@ public class UserService {
             throw new BadRequestException("User already exists", "POST /users");
         }
 
-        return storage.create(user);
+        storage.create(user);
     }
 
-    public User update(User user) {
+    public void update(User user) {
         if (getOneById(user.getId()) == null) {
              throw new NotFoundException("User is not found", "PUT /users");
         }
 
-        return storage.update(user);
+        storage.update(user);
     }
 
-    // TODO
-//    public void addFriend(int userId, int friendId) {
-//
-//    }
+    public void addFriend(int userId, int friendId) {
+        User user = getOneById(userId);
 
-    // TODO
-//    public void removeFriend(int userId, int friendId) {
-//
-//    }
+        if (user == null) {
+            // TODO add path
+            throw new NotFoundException("User is not found", "path");
+        }
 
-    // TODO
-//    public List<User> getUsersFriends(int userId) {
-//
-//    }
+        User friend = getOneById(friendId);
 
-    // TODO
-//    public List<User> getMutualFriends() {
-//
-//    }
+        if (friend == null) {
+            // TODO add path
+            throw new NotFoundException("Friend is not found", "path");
+        }
+
+        Set<Integer> userFriends = user.getFriendsIdList();
+        userFriends.add(friend.getId());
+        user.setFriendsIdList(userFriends);
+        storage.update(user);
+
+        Set<Integer> friendFriends = friend.getFriendsIdList();
+        friendFriends.add(user.getId());
+        friend.setFriendsIdList(friendFriends);
+        storage.update(friend);
+    }
+
+    public void removeFriend(int userId, int friendId) {
+        User user = getOneById(userId);
+
+        if (user == null) {
+            // TODO add path
+            throw new NotFoundException("User is not found", "path");
+        }
+
+        User friend = getOneById(friendId);
+
+        if (friend == null) {
+            // TODO add path
+            throw new NotFoundException("Friend is not found", "path");
+        }
+
+        Set<Integer> userFriends = user.getFriendsIdList();
+        userFriends.remove(friend.getId());
+        user.setFriendsIdList(userFriends);
+        storage.update(user);
+
+        Set<Integer> friendFriends = friend.getFriendsIdList();
+        friendFriends.remove(user.getId());
+        friend.setFriendsIdList(friendFriends);
+        storage.update(friend);
+    }
+
+    public List<User> getUsersFriends(int userId) {
+        User user = getOneById(userId);
+
+        if (user == null) {
+            // TODO add path
+            throw new NotFoundException("User is not found", "path");
+        }
+
+        return user.getFriendsIdList().stream()
+                .map(storage::getOneById)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getMutualFriends(int userId, int otherUserId) {
+        User user1 = getOneById(userId);
+
+        if (user1 == null) {
+            // TODO add path
+            throw new NotFoundException("User is not found", "path");
+        }
+
+        User user2 = getOneById(otherUserId);
+
+        if (user2 == null) {
+            // TODO add path
+            throw new NotFoundException("Other user is not found", "path");
+        }
+
+        return user1.getFriendsIdList().stream()
+                .filter(user2.getFriendsIdList()::contains)
+                .map(storage::getOneById)
+                .collect(Collectors.toList());
+    }
 }
