@@ -37,7 +37,7 @@ public class UserService {
         return storage.getAll();
     }
 
-    public void create(User user) {
+    public User create(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -46,23 +46,15 @@ public class UserService {
             throw new BadRequestException("User already exists", "POST /users");
         }
 
-        if (user.getFriendsIdList() == null) {
-            user.setFriendsIdList(new HashSet<>());
-        }
-
-        storage.create(user);
+        return storage.create(user);
     }
 
-    public void update(User user) {
+    public User update(User user) {
         if (getOneById(user.getId()) == null) {
              throw new NotFoundException("User is not found", "PUT /users");
         }
 
-        if (user.getFriendsIdList() == null) {
-            user.setFriendsIdList(new HashSet<>());
-        }
-
-        storage.update(user);
+        return storage.update(user);
     }
 
     public void addFriend(int userId, int friendId) {
@@ -78,15 +70,8 @@ public class UserService {
             throw new NotFoundException("Friend is not found", "PUT /users/{id}/friends/{friendId}");
         }
 
-        Set<Integer> userFriends = user.getFriendsIdList();
-        userFriends.add(friend.getId());
-        user.setFriendsIdList(userFriends);
-        storage.update(user);
-
-        Set<Integer> friendFriends = friend.getFriendsIdList();
-        friendFriends.add(user.getId());
-        friend.setFriendsIdList(friendFriends);
-        storage.update(friend);
+        user.getFriendsIdList().add(friend.getId());
+        friend.getFriendsIdList().add(user.getId());
     }
 
     public void removeFriend(int userId, int friendId) {
@@ -102,15 +87,8 @@ public class UserService {
             throw new NotFoundException("Friend is not found", "DELETE /users/{id}/friends/{friendId}");
         }
 
-        Set<Integer> userFriends = user.getFriendsIdList();
-        userFriends.remove(friend.getId());
-        user.setFriendsIdList(userFriends);
-        storage.update(user);
-
-        Set<Integer> friendFriends = friend.getFriendsIdList();
-        friendFriends.remove(user.getId());
-        friend.setFriendsIdList(friendFriends);
-        storage.update(friend);
+        user.getFriendsIdList().remove(friend.getId());
+        friend.getFriendsIdList().remove(user.getId());
     }
 
     public List<User> getUserFriends(int userId) {
@@ -138,16 +116,10 @@ public class UserService {
             throw new NotFoundException("Other user is not found", "GET /users/{id}/friends/common/{otherId}");
         }
 
-        Set<Integer> smallIdList = user1.getFriendsIdList().size() <= user2.getFriendsIdList().size()
-                ? user1.getFriendsIdList()
-                : user2.getFriendsIdList();
+        Set<Integer> intersectionSet = new HashSet<>(user1.getFriendsIdList());
+        intersectionSet.retainAll(user2.getFriendsIdList());
 
-        Set<Integer> bigIdList = user2.getFriendsIdList().size() >= user1.getFriendsIdList().size()
-                ? user2.getFriendsIdList()
-                : user1.getFriendsIdList();
-
-        return smallIdList.stream()
-                .filter(bigIdList::contains)
+        return intersectionSet.stream()
                 .map(storage::getOneById)
                 .collect(Collectors.toList());
     }

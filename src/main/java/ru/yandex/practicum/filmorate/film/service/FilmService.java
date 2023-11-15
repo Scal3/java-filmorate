@@ -8,16 +8,13 @@ import ru.yandex.practicum.filmorate.film.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.user.model.User;
 import ru.yandex.practicum.filmorate.user.service.UserService;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private static final int BASE_TOP_FILM_VALUE = 10;
-    FilmStorage storage;
-    UserService userService;
+    private final FilmStorage storage;
+    private final UserService userService;
 
     public FilmService(FilmStorage storage, UserService userService) {
         this.storage = storage;
@@ -42,28 +39,20 @@ public class FilmService {
         return storage.getAll();
     }
 
-    public void create(Film film) {
+    public Film create(Film film) {
         if (getOneByName(film.getName()) != null) {
             throw new BadRequestException("Film already exists", "POST /films");
         }
 
-        if (film.getUserLikesList() == null) {
-            film.setUserLikesList(new HashSet<>());
-        }
-
-        storage.create(film);
+        return storage.create(film);
     }
 
-    public void update(Film film) {
+    public Film update(Film film) {
         if (getOneById(film.getId()) == null) {
             throw new NotFoundException("Film is not found", "PUT /films");
         }
 
-        if (film.getUserLikesList() == null) {
-            film.setUserLikesList(new HashSet<>());
-        }
-
-        storage.update(film);
+        return storage.update(film);
     }
 
     public void addLike(int filmId, int userId) {
@@ -79,10 +68,7 @@ public class FilmService {
             throw new NotFoundException("User is not found", "PUT /films/{id}/like/{userId}");
         }
 
-        Set<Integer> userLikesList = film.getUserLikesList();
-        userLikesList.add(user.getId());
-        film.setUserLikesList(userLikesList);
-        update(film);
+        film.getUserLikesList().add(user.getId());
     }
 
     public void removeLike(int filmId, int userId) {
@@ -98,17 +84,14 @@ public class FilmService {
             throw new NotFoundException("User is not found", "DELETE /films/{id}/like/{userId}");
         }
 
-        Set<Integer> userLikesList = film.getUserLikesList();
-        userLikesList.remove(user.getId());
-        film.setUserLikesList(userLikesList);
-        update(film);
+        film.getUserLikesList().remove(user.getId());
     }
 
     public List<Film> getTopFilms(int count) {
         return getAll().stream()
                 .sorted((film1, film2) ->
                         Integer.compare(film2.getUserLikesList().size(), film1.getUserLikesList().size()))
-                .limit(count > 0 ? count : BASE_TOP_FILM_VALUE)
+                .limit(count)
                 .collect(Collectors.toList());
     }
 }

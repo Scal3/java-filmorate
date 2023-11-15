@@ -34,19 +34,19 @@ public class UserController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        userService.create(user);
+        User createdUser = userService.create(user);
         log.debug("User {} has been created", user.getName());
 
-        return userService.getOneByName(user.getName());
+        return createdUser;
     }
 
     @ResponseStatus(value = HttpStatus.OK)
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        userService.update(user);
+        User updatedUser = userService.update(user);
         log.debug("User {} has been updated", user.getName());
 
-        return userService.getOneById(user.getId());
+        return updatedUser;
     }
 
     @ResponseStatus(value = HttpStatus.OK)
