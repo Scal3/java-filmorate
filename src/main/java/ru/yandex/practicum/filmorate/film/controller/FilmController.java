@@ -3,43 +3,39 @@ package ru.yandex.practicum.filmorate.film.controller;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.film.model.Film;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.film.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
 @RequestMapping("/films")
 @RestController
 public class FilmController {
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private int filmId = 0;
+    FilmService filmService;
+
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public List<Film> getFilms() {
-        return new ArrayList<>(films.values());
+        return filmService.getAll();
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        film.setId(++filmId);
-        films.put(filmId, film);
-
+        filmService.create(film);
         log.debug("Film {} has been created", film.getName());
 
-        return film;
+        return filmService.getOneByName(film.getName());
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        // TODO make it later
-//        if (!films.containsKey(film.getId())) throw new NotFoundException("Film is not found");
-
-        films.replace(film.getId(), film);
-
+        filmService.update(film);
         log.debug("Film {} has been updated", film.getName());
 
-        return film;
+        return filmService.getOneById(film.getId());
     }
 }

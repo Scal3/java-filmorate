@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.film.model.Film;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -13,8 +14,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int filmId = 0;
 
     @Override
-    public Film getOne(int id) {
+    public Film getOneById(int id) {
         return films.get(id);
+    }
+
+    @Override
+    public Film getOneByName(String name) {
+        Optional<Film> filmOptional = films.values().stream()
+                .filter(film -> film.getName().equals(name))
+                .findFirst();
+
+        return filmOptional.orElse(null);
     }
 
     @Override

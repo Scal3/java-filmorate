@@ -130,8 +130,16 @@ public class UserService {
             throw new NotFoundException("Other user is not found", "path");
         }
 
-        return user1.getFriendsIdList().stream()
-                .filter(user2.getFriendsIdList()::contains)
+        Set<Integer> smallerIdList = user1.getFriendsIdList().size() <= user2.getFriendsIdList().size()
+                ? user1.getFriendsIdList()
+                : user2.getFriendsIdList();
+
+        Set<Integer> biggerIdList = user1.getFriendsIdList().size() >= user2.getFriendsIdList().size()
+                ? user1.getFriendsIdList()
+                : user2.getFriendsIdList();
+
+        return smallerIdList.stream()
+                .filter(biggerIdList::contains)
                 .map(storage::getOneById)
                 .collect(Collectors.toList());
     }
