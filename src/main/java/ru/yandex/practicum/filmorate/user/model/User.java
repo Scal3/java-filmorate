@@ -26,6 +26,8 @@ public class User {
 
     private Set<Integer> friendsIdList;
 
+    private FriendshipStatus friendshipStatus;
+
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
         this.login = login;

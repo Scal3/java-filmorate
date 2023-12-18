@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/films")
 @RestController
 public class FilmController {
-    FilmService filmService;
+    private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;

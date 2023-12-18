@@ -30,11 +30,17 @@ public class Film {
 
     private Set<Integer> userLikesList;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    private Set<String> genre;
+
+    private MPA mpa;
+
+    public Film(String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.mpa = mpa;
         this.userLikesList = new HashSet<>();
+        this.genre = new HashSet<>();
     }
 }
