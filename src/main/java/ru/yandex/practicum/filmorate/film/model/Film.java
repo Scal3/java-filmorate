@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 public class Film {
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Name must contain characters")
     @Size(min = 1, max = 50, message = "Name must be between 1 and 50 characters")
@@ -26,7 +26,7 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive(message = "Duration must be positive value")
-    private int duration;
+    private Integer duration;
 
     private Set<Integer> userLikesList;
 

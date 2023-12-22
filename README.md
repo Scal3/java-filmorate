@@ -2,4 +2,4 @@
 Template repository for Filmorate project
 
 ## DB schema
-<img src="./filmorate.svg" />
+<img src="https://i.postimg.cc/4yfTqQxC/temp-Image-SJKfq-I.jpg"  alt="DB schema"/>

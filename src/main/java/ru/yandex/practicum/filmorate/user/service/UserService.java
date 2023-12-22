@@ -20,13 +20,7 @@ public class UserService {
     }
 
     public User getOneById(int id) {
-        User user = storage.getOneById(id);
-
-        if (user == null) {
-            throw new NotFoundException("User is not found", "GET /users/{id}");
-        }
-
-        return user;
+        return getUserOrThrowException(id, "User is not found", "GET /users/{id}");
     }
 
     public User getOneByName(String name) {
@@ -50,53 +44,32 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (getOneById(user.getId()) == null) {
-             throw new NotFoundException("User is not found", "PUT /users");
-        }
+        getUserOrThrowException(user.getId(), "User is not found", "PUT /users");
 
         return storage.update(user);
     }
 
     public void addFriend(int userId, int friendId) {
-        User user = getOneById(userId);
+        if (userId == friendId)
+            throw new BadRequestException("Can not add yourself", "PUT /users/{id}/friends/{friendId}");
 
-        if (user == null) {
-            throw new NotFoundException("User is not found", "PUT /users/{id}/friends/{friendId}");
-        }
-
-        User friend = getOneById(friendId);
-
-        if (friend == null) {
-            throw new NotFoundException("Friend is not found", "PUT /users/{id}/friends/{friendId}");
-        }
+        User user = getUserOrThrowException(userId, "User is not found", "PUT /users/{id}/friends/{friendId}");
+        User friend = getUserOrThrowException(friendId, "Friend is not found", "PUT /users/{id}/friends/{friendId}");
 
         user.getFriendsIdList().add(friend.getId());
         friend.getFriendsIdList().add(user.getId());
     }
 
     public void removeFriend(int userId, int friendId) {
-        User user = getOneById(userId);
-
-        if (user == null) {
-            throw new NotFoundException("User is not found", "DELETE /users/{id}/friends/{friendId}");
-        }
-
-        User friend = getOneById(friendId);
-
-        if (friend == null) {
-            throw new NotFoundException("Friend is not found", "DELETE /users/{id}/friends/{friendId}");
-        }
+        User user = getUserOrThrowException(userId, "User is not found", "DELETE /users/{id}/friends/{friendId}");
+        User friend = getUserOrThrowException(friendId, "Friend is not found", "DELETE /users/{id}/friends/{friendId}");
 
         user.getFriendsIdList().remove(friend.getId());
         friend.getFriendsIdList().remove(user.getId());
     }
 
     public List<User> getUserFriends(int userId) {
-        User user = getOneById(userId);
-
-        if (user == null) {
-            throw new NotFoundException("User is not found", "GET /users/{id}/friends");
-        }
+        User user = getUserOrThrowException(userId, "User is not found", "GET /users/{id}/friends");
 
         return user.getFriendsIdList().stream()
                 .map(storage::getOneById)
@@ -104,17 +77,9 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(int userId, int otherUserId) {
-        User user1 = getOneById(userId);
-
-        if (user1 == null) {
-            throw new NotFoundException("User is not found", "GET /users/{id}/friends/common/{otherId}");
-        }
-
-        User user2 = getOneById(otherUserId);
-
-        if (user2 == null) {
-            throw new NotFoundException("Other user is not found", "GET /users/{id}/friends/common/{otherId}");
-        }
+        User user1 = getUserOrThrowException(userId, "User is not found", "GET /users/{id}/friends/common/{otherId}");
+        User user2 = getUserOrThrowException(
+                otherUserId, "Other user is not found", "GET /users/{id}/friends/common/{otherId}");
 
         Set<Integer> intersectionSet = new HashSet<>(user1.getFriendsIdList());
         intersectionSet.retainAll(user2.getFriendsIdList());
@@ -122,5 +87,15 @@ public class UserService {
         return intersectionSet.stream()
                 .map(storage::getOneById)
                 .collect(Collectors.toList());
+    }
+
+    private User getUserOrThrowException(int userId, String errMessage, String endpoint) {
+        User user = storage.getOneById(userId);
+
+        if (user == null) {
+            throw new NotFoundException(errMessage, endpoint);
+        }
+
+        return user;
     }
 }
