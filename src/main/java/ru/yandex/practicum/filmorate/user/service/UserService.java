@@ -1,30 +1,25 @@
 package ru.yandex.practicum.filmorate.user.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.user.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.user.model.User;
 import ru.yandex.practicum.filmorate.user.storage.UserStorage;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class UserService {
     private final UserStorage storage;
 
-    public UserService(UserStorage storage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage storage) {
         this.storage = storage;
     }
 
     public User getOneById(int id) {
         return getUserOrThrowException(id, "User is not found", "GET /users/{id}");
-    }
-
-    public User getOneByName(String name) {
-        return storage.getOneByName(name);
     }
 
     public List<User> getAll() {
@@ -34,10 +29,6 @@ public class UserService {
     public User create(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
-        }
-
-        if (getOneByName(user.getName()) != null) {
-            throw new BadRequestException("User already exists", "POST /users");
         }
 
         return storage.create(user);
@@ -56,24 +47,36 @@ public class UserService {
         User user = getUserOrThrowException(userId, "User is not found", "PUT /users/{id}/friends/{friendId}");
         User friend = getUserOrThrowException(friendId, "Friend is not found", "PUT /users/{id}/friends/{friendId}");
 
-        user.getFriendsIdList().add(friend.getId());
-        friend.getFriendsIdList().add(user.getId());
+        if (storage.isUserFriendOfOtherUser(friend.getId(), user.getId())) {
+            storage.addFriend(userId, friendId, FriendshipStatus.APPROVED);
+        } else {
+            storage.addFriend(userId, friendId, FriendshipStatus.UNAPPROVED);
+        }
     }
 
     public void removeFriend(int userId, int friendId) {
+        if (userId == friendId)
+            throw new BadRequestException("Can not remove yourself", "DELETE /users/{id}/friends/{friendId}");
+
         User user = getUserOrThrowException(userId, "User is not found", "DELETE /users/{id}/friends/{friendId}");
         User friend = getUserOrThrowException(friendId, "Friend is not found", "DELETE /users/{id}/friends/{friendId}");
 
-        user.getFriendsIdList().remove(friend.getId());
-        friend.getFriendsIdList().remove(user.getId());
+        if (storage.isUserFriendOfOtherUser(user.getId(), friend.getId())) {
+            storage.removeFriend(userId, friendId);
+        } else {
+            throw new BadRequestException(
+                    "User with id " + friend.getId() + " is not your friend",
+                    "DELETE /users/{id}/friends/{friendId}"
+            );
+        }
+
+        if (storage.isUserFriendOfOtherUser(friend.getId(), user.getId())) {
+            storage.changeFriendshipStatus(friend.getId(), FriendshipStatus.UNAPPROVED);
+        }
     }
 
     public List<User> getUserFriends(int userId) {
-        User user = getUserOrThrowException(userId, "User is not found", "GET /users/{id}/friends");
-
-        return user.getFriendsIdList().stream()
-                .map(storage::getOneById)
-                .collect(Collectors.toList());
+        return storage.getUserFriends(userId);
     }
 
     public List<User> getMutualFriends(int userId, int otherUserId) {
@@ -81,21 +84,19 @@ public class UserService {
         User user2 = getUserOrThrowException(
                 otherUserId, "Other user is not found", "GET /users/{id}/friends/common/{otherId}");
 
-        Set<Integer> intersectionSet = new HashSet<>(user1.getFriendsIdList());
-        intersectionSet.retainAll(user2.getFriendsIdList());
+        Set<User> intersectionSet = new HashSet<>(storage.getUserFriends(user1.getId()));
+        intersectionSet.retainAll(storage.getUserFriends(user2.getId()));
 
-        return intersectionSet.stream()
-                .map(storage::getOneById)
-                .collect(Collectors.toList());
+        return new ArrayList<>(intersectionSet);
     }
 
-    private User getUserOrThrowException(int userId, String errMessage, String endpoint) {
-        User user = storage.getOneById(userId);
+    private User getUserOrThrowException(int id, String errMessage, String endpoint) {
+        Optional<User> optionalUser = storage.getOneById(id);
 
-        if (user == null) {
+        if (optionalUser.isEmpty()) {
             throw new NotFoundException(errMessage, endpoint);
         }
 
-        return user;
+        return optionalUser.get();
     }
 }

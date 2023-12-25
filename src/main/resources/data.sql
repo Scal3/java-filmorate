@@ -1,34 +1,56 @@
-INSERT INTO genre (genre_name) VALUES ('Комедия')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Комедия' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
-INSERT INTO genre (genre_name) VALUES ('Драма')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Драма' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
-INSERT INTO genre (genre_name) VALUES ('Мультфильм')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Мультфильм' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
-INSERT INTO genre (genre_name) VALUES ('Триллер')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Триллер' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
-INSERT INTO genre (genre_name) VALUES ('Документальный')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Документальный' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
-INSERT INTO genre (genre_name) VALUES ('Боевик')
-ON CONFLICT (genre_name) DO NOTHING;
+MERGE INTO genre USING (SELECT 'Боевик' AS genre_name) source
+ON genre.genre_name = source.genre_name
+WHEN NOT MATCHED THEN
+  INSERT (genre_name) VALUES (source.genre_name);
 
 
 
-INSERT INTO mpa (mpa_value) VALUES ('G')
-ON CONFLICT (mpa_value) DO NOTHING;
+MERGE INTO mpa USING (SELECT 'G' AS mpa_value) source
+ON mpa.mpa_value = source.mpa_value
+WHEN NOT MATCHED THEN
+  INSERT (mpa_value) VALUES (source.mpa_value);
 
-INSERT INTO mpa (mpa_value) VALUES ('PG')
-ON CONFLICT (mpa_value) DO NOTHING;
+MERGE INTO mpa USING (SELECT 'PG' AS mpa_value) source
+ON mpa.mpa_value = source.mpa_value
+WHEN NOT MATCHED THEN
+  INSERT (mpa_value) VALUES (source.mpa_value);
 
-INSERT INTO mpa (mpa_value) VALUES ('PG-13')
-ON CONFLICT (mpa_value) DO NOTHING;
+MERGE INTO mpa USING (SELECT 'PG-13' AS mpa_value) source
+ON mpa.mpa_value = source.mpa_value
+WHEN NOT MATCHED THEN
+  INSERT (mpa_value) VALUES (source.mpa_value);
 
-INSERT INTO mpa (mpa_value) VALUES ('R')
-ON CONFLICT (mpa_value) DO NOTHING;
+MERGE INTO mpa USING (SELECT 'R' AS mpa_value) source
+ON mpa.mpa_value = source.mpa_value
+WHEN NOT MATCHED THEN
+  INSERT (mpa_value) VALUES (source.mpa_value);
 
-INSERT INTO mpa (mpa_value) VALUES ('NC-17')
-ON CONFLICT (mpa_value) DO NOTHING;
+MERGE INTO mpa USING (SELECT 'NC-17' AS mpa_value) source
+ON mpa.mpa_value = source.mpa_value
+WHEN NOT MATCHED THEN
+  INSERT (mpa_value) VALUES (source.mpa_value);
