@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.film.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import ru.yandex.practicum.filmorate.film.model.Film;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.film.model.Film;
 import ru.yandex.practicum.filmorate.film.service.FilmService;
 
 import javax.validation.Valid;

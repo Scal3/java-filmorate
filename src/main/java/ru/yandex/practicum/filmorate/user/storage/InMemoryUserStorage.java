@@ -68,4 +68,9 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getUserFriends(int userId) {
         return null;
     }
+
+    @Override
+    public List<User> getMutualFriends(int userId, int otherUserId) {
+        return null;
+    }
 }

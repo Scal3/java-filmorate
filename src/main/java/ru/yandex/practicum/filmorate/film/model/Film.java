@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.film.model;
 
 import lombok.Data;
 import ru.yandex.practicum.filmorate.film.validation.ReleaseDateConstraint;
+import ru.yandex.practicum.filmorate.genre.model.Genre;
+import ru.yandex.practicum.filmorate.mpa.model.Mpa;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -30,17 +32,23 @@ public class Film {
 
     private Set<Integer> userLikesList;
 
-    private Set<String> genre;
+    private Set<Genre> genres;
 
-    private MPA mpa;
+    private Mpa mpa;
 
-    public Film(String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
+    public Film() {
+        this.userLikesList = new HashSet<>();
+        this.genres = new HashSet<>();
+    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
         this.userLikesList = new HashSet<>();
-        this.genre = new HashSet<>();
+        this.genres = new HashSet<>();
     }
 }

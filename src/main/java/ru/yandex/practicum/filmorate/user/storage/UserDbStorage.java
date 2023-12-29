@@ -200,4 +200,33 @@ public class UserDbStorage implements UserStorage {
 
         return jdbcTemplate.query(sqlQuery, userFriendRowMapper, userId);
     }
+
+    @Override
+    public List<User> getMutualFriends(int userId, int otherUserId) {
+        String sqlAllUsersFriendsIdsSubQuery =
+                                "(SELECT user_friend.followed_user_id AS friend_id " +
+                                "FROM user_friend " +
+                                "WHERE user_friend.following_user_id = ? " +
+                                    "OR user_friend.following_user_id = ?)";
+
+        String sqlMutualUsersIdsSubQuery =
+                                "(SELECT " +
+                                    "all_friends.friend_id, " +
+                                    "COUNT(all_friends.friend_id) AS friend_repeat " +
+                                "FROM " + sqlAllUsersFriendsIdsSubQuery + " AS all_friends " +
+                                "GROUP BY all_friends.friend_id " +
+                                "HAVING friend_repeat = 2)";
+
+        String sqlGetUsersFriends =
+                                "SELECT " +
+                                    "filmorate_user.id, " +
+                                    "filmorate_user.email, " +
+                                    "filmorate_user.login, " +
+                                    "filmorate_user.user_name, " +
+                                    "filmorate_user.birthday " +
+                                "FROM " + sqlMutualUsersIdsSubQuery + " AS mutual_friends " +
+                                "JOIN filmorate_user ON mutual_friends.friend_id = filmorate_user.id;";
+
+        return jdbcTemplate.query(sqlGetUsersFriends, userRowMapper, userId, otherUserId);
+    }
 }

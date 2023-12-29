@@ -14,17 +14,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int filmId = 0;
 
     @Override
-    public Film getOneById(int id) {
-        return films.get(id);
-    }
-
-    @Override
-    public Film getOneByName(String name) {
-        Optional<Film> filmOptional = films.values().stream()
-                .filter(film -> film.getName().equals(name))
-                .findFirst();
-
-        return filmOptional.orElse(null);
+    public Optional<Film> getOneById(int id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
@@ -50,5 +41,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void delete(int id) {
         films.remove(id);
+    }
+
+    @Override
+    public void addLike(int filmId, int userId) {
+
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+
+    }
+
+    @Override
+    public List<Film> getTopFilms(int count) {
+        return null;
     }
 }

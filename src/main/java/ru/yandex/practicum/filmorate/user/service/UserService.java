@@ -80,14 +80,10 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(int userId, int otherUserId) {
-        User user1 = getUserOrThrowException(userId, "User is not found", "GET /users/{id}/friends/common/{otherId}");
-        User user2 = getUserOrThrowException(
-                otherUserId, "Other user is not found", "GET /users/{id}/friends/common/{otherId}");
+        getUserOrThrowException(userId, "User is not found", "GET /users/{id}/friends/common/{otherId}");
+        getUserOrThrowException(otherUserId, "Other user is not found", "GET /users/{id}/friends/common/{otherId}");
 
-        Set<User> intersectionSet = new HashSet<>(storage.getUserFriends(user1.getId()));
-        intersectionSet.retainAll(storage.getUserFriends(user2.getId()));
-
-        return new ArrayList<>(intersectionSet);
+        return storage.getMutualFriends(userId, otherUserId);
     }
 
     private User getUserOrThrowException(int id, String errMessage, String endpoint) {
