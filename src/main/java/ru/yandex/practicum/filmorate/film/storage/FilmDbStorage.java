@@ -189,6 +189,17 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId()
         );
 
+        String sqlGenreRemove = "DELETE FROM film_genre WHERE film_id = ?;";
+        jdbcTemplate.update(sqlGenreRemove, film.getId());
+
+        for (Genre genre : film.getGenres()) {
+            String sqlGenreInsert =
+                    "INSERT INTO film_genre (film_id, genre_id) " +
+                    "VALUES (?, ?);";
+
+            jdbcTemplate.update(sqlGenreInsert, film.getId(), genre.getId());
+        }
+
         return getOneById(film.getId()).get();
     }
 
