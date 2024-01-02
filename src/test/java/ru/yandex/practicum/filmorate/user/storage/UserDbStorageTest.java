@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.user.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.user.model.User;
 
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetUserById() {
         User user = new User(
@@ -40,6 +42,7 @@ class UserDbStorageTest {
                 .isEqualTo(user);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testFindAllUsers() {
         User user1 = new User(
@@ -71,6 +74,7 @@ class UserDbStorageTest {
                 .isEqualTo(usersList);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testCreateUser() {
         User user = new User(
@@ -92,6 +96,7 @@ class UserDbStorageTest {
                 .isEqualTo(user);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testUpdateUser() {
         User user = new User(
@@ -123,6 +128,7 @@ class UserDbStorageTest {
                 .isEqualTo(user);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testDeleteUser() {
         User user = new User(
@@ -151,6 +157,7 @@ class UserDbStorageTest {
                 .isEqualTo(true);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testIsUserFriendOfOtherUser() {
         User user1 = new User(
@@ -179,6 +186,7 @@ class UserDbStorageTest {
                 .isEqualTo(false);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testChangeFriendshipStatus() {
         User user1 = new User(
@@ -210,6 +218,7 @@ class UserDbStorageTest {
                 .isEqualTo(FriendshipStatus.APPROVED);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testAddFriend() {
         User user1 = new User(
@@ -247,6 +256,7 @@ class UserDbStorageTest {
                 .isEqualTo(userFriends);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testRemoveFriend() {
         User user1 = new User(
@@ -291,6 +301,7 @@ class UserDbStorageTest {
                 .isEqualTo(0);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetUserFriends() {
         User user1 = new User(
@@ -326,6 +337,7 @@ class UserDbStorageTest {
                 .isEqualTo(userFriends);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetMutualFriends() {
         User user1 = new User(

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.film.model.Film;
 import ru.yandex.practicum.filmorate.mpa.model.Mpa;
 import ru.yandex.practicum.filmorate.user.model.User;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FilmDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetFilmById() {
         Film film = new Film(
@@ -45,6 +47,7 @@ class FilmDbStorageTest {
                 .isEqualTo(film);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetAllFilms() {
         Film film1 = new Film(
@@ -78,6 +81,7 @@ class FilmDbStorageTest {
                 .isEqualTo(filmsList);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testCreateFilm() {
         Film film = new Film(
@@ -100,6 +104,7 @@ class FilmDbStorageTest {
                 .isEqualTo(film);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testUpdateFilm() {
         Film film = new Film(
@@ -132,6 +137,7 @@ class FilmDbStorageTest {
                 .isEqualTo(film);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testDeleteFilm() {
         Film film = new Film(
@@ -161,6 +167,7 @@ class FilmDbStorageTest {
                 .isEqualTo(true);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testAddFilmLike() {
         Film film = new Film(
@@ -199,6 +206,7 @@ class FilmDbStorageTest {
                 .isEqualTo(userLikesList);
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testRemoveFilmLike() {
         Film film = new Film(
@@ -244,6 +252,7 @@ class FilmDbStorageTest {
                 .isEqualTo(new HashSet<>());
     }
 
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     @Test
     public void testGetTopFilms() {
         Film film1 = new Film(
