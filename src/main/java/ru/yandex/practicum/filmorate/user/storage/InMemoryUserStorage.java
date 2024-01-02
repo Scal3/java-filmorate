@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void changeFriendshipStatus(int userId, FriendshipStatus friendshipStatus) {
+    public void changeFriendshipStatus(int userId, int friendId, FriendshipStatus friendshipStatus) {
 
     }
 

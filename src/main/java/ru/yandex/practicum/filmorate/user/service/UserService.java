@@ -70,8 +70,11 @@ public class UserService {
             );
         }
 
+        // if the userId is a friend of the friendId,
+        // we have to change the friendId's friendship status between them
+        // Because the userId removed the friendId from his friends
         if (storage.isUserFriendOfOtherUser(friend.getId(), user.getId())) {
-            storage.changeFriendshipStatus(friend.getId(), FriendshipStatus.UNAPPROVED);
+            storage.changeFriendshipStatus(friend.getId(), user.getId(), FriendshipStatus.UNAPPROVED);
         }
     }
 

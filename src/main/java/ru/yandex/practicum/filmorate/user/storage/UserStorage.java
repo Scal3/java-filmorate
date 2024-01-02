@@ -21,7 +21,7 @@ public interface UserStorage {
 
     boolean isUserFriendOfOtherUser(int userId, int expectedFriendId);
 
-    void changeFriendshipStatus(int userId, FriendshipStatus friendshipStatus);
+    void changeFriendshipStatus(int userId, int friendId, FriendshipStatus friendshipStatus);
 
     void removeFriend(int userId, int friendId);
 
