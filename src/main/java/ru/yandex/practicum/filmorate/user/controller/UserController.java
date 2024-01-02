@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.user.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import ru.yandex.practicum.filmorate.user.model.User;
 import org.springframework.web.bind.annotation.*;
@@ -10,14 +12,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping("/users")
 @RestController
 public class UserController {
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @ResponseStatus(value = HttpStatus.OK)
     @GetMapping
