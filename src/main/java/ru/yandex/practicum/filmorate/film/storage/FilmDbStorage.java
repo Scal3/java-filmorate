@@ -38,6 +38,8 @@ public class FilmDbStorage implements FilmStorage {
         return filmWithGenre;
     };
 
+    private final RowMapper<Integer> filmUserLikesRowMapper = (rs, rowNum) -> rs.getInt("user_id");
+
     private final RowMapper<Genre> genreRowMapper = (rs, rowNum) -> {
         Genre genre = new Genre();
         genre.setId(rs.getInt("genre_id"));
@@ -81,6 +83,16 @@ public class FilmDbStorage implements FilmStorage {
                                 "WHERE film_genre.film_id = ?;";
 
             film.getGenres().addAll(jdbcTemplate.query(sqlGenresQuery, genreRowMapper, film.getId()));
+
+            String sqlFilmLikesQuery =
+                                "SELECT " +
+                                    "user_id " +
+                                "FROM film_user_like " +
+                                "WHERE film_id = ?;";
+
+            film.getUserLikesList().addAll(
+                    jdbcTemplate.query(sqlFilmLikesQuery, filmUserLikesRowMapper, film.getId())
+            );
 
             return Optional.of(film);
         } else {

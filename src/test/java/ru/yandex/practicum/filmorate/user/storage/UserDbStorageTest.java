@@ -105,6 +105,13 @@ class UserDbStorageTest {
         UserDbStorage storage = new UserDbStorage(jdbcTemplate);
         storage.create(user);
 
+        User createdUser = storage.getOneById(1).get();
+
+        assertThat(createdUser)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(user);
+
         user.setEmail("updatedEmail@gmail.com");
         storage.update(user);
 
@@ -128,6 +135,14 @@ class UserDbStorageTest {
 
         UserDbStorage storage = new UserDbStorage(jdbcTemplate);
         storage.create(user);
+
+        User createdUser = storage.getOneById(1).get();
+
+        assertThat(createdUser)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(user);
+
         storage.delete(1);
 
         boolean deletedUser = storage.getOneById(1).isEmpty();
@@ -212,16 +227,24 @@ class UserDbStorageTest {
                 "name2",
                 LocalDate.of(2000, Month.JULY, 7)
         );
+        user2.setFriendshipStatus(FriendshipStatus.UNAPPROVED);
 
         UserDbStorage storage = new UserDbStorage(jdbcTemplate);
         storage.create(user1);
         storage.create(user2);
         storage.addFriend(1, 2, FriendshipStatus.UNAPPROVED);
 
-        List<User> userFriends = storage.getUserFriends(1);
+        List<User> userDbFriends = storage.getUserFriends(1);
 
-        assertThat(userFriends.size())
+        assertThat(userDbFriends.size())
                 .isEqualTo(1);
+
+        List<User> userFriends = List.of(user2);
+
+        assertThat(userDbFriends)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(userFriends);
     }
 
     @Test
@@ -241,16 +264,30 @@ class UserDbStorageTest {
                 "name2",
                 LocalDate.of(2000, Month.JULY, 7)
         );
+        user2.setFriendshipStatus(FriendshipStatus.UNAPPROVED);
 
         UserDbStorage storage = new UserDbStorage(jdbcTemplate);
         storage.create(user1);
         storage.create(user2);
         storage.addFriend(1, 2, FriendshipStatus.UNAPPROVED);
+
+        List<User> userDbFriends = storage.getUserFriends(1);
+
+        assertThat(userDbFriends.size())
+                .isEqualTo(1);
+
+        List<User> userFriends = List.of(user2);
+
+        assertThat(userDbFriends)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(userFriends);
+
         storage.removeFriend(1, 2);
 
-        List<User> userFriends = storage.getUserFriends(1);
+        List<User> userDbFriendsAfterRemoving = storage.getUserFriends(1);
 
-        assertThat(userFriends.size())
+        assertThat(userDbFriendsAfterRemoving.size())
                 .isEqualTo(0);
     }
 
@@ -271,16 +308,22 @@ class UserDbStorageTest {
                 "name2",
                 LocalDate.of(2000, Month.JULY, 7)
         );
+        user2.setFriendshipStatus(FriendshipStatus.UNAPPROVED);
 
         UserDbStorage storage = new UserDbStorage(jdbcTemplate);
         storage.create(user1);
         storage.create(user2);
         storage.addFriend(1, 2, FriendshipStatus.UNAPPROVED);
 
-        List<User> userFriends = storage.getUserFriends(1);
+        List<User> userDbFriends = storage.getUserFriends(1);
+        List<User> userFriends = List.of(user2);
 
-        assertThat(userFriends.size())
+        assertThat(userDbFriends.size())
                 .isEqualTo(1);
+
+        assertThat(userDbFriends).isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(userFriends);
     }
 
     @Test
@@ -316,10 +359,15 @@ class UserDbStorageTest {
         storage.addFriend(1, 3, FriendshipStatus.UNAPPROVED);
         storage.addFriend(2, 3, FriendshipStatus.UNAPPROVED);
 
-        List<User> mutualFriends = storage.getMutualFriends(1, 2);
+        List<User> mutualDbFriends = storage.getMutualFriends(1, 2);
+        List<User> mutualFriends = List.of(user3);
 
-        assertThat(mutualFriends.size())
+        assertThat(mutualDbFriends.size())
                 .isEqualTo(1);
-    }
 
+        assertThat(mutualDbFriends)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(mutualFriends);
+    }
 }
