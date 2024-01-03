@@ -3,11 +3,15 @@ package ru.yandex.practicum.filmorate.film.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.film.model.Film;
 import ru.yandex.practicum.filmorate.genre.model.Genre;
 import ru.yandex.practicum.filmorate.mpa.model.Mpa;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -137,28 +141,27 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         String sqlFilmInsert =
-                    "INSERT INTO film (film_name, description, releaseDate, duration, mpa_id) " +
-                    "VALUES (?, ?, ?, ?, ?);";
+                "INSERT INTO film (film_name, description, releaseDate, duration, mpa_id) " +
+                        "VALUES (?, ?, ?, ?, ?);";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(
-                sqlFilmInsert,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId()
-        );
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sqlFilmInsert, new String[]{"ID"});
+            ps.setString(1, film.getName());
+            ps.setString(2, film.getDescription());
+            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
+            ps.setInt(4, film.getDuration());
+            ps.setInt(5, film.getMpa().getId());
 
-        String sqlFilmIdSelect = "SELECT id FROM film WHERE film_name = ?;";
+            return ps;
+        }, keyHolder);
 
-        Integer filmId = jdbcTemplate.queryForObject(sqlFilmIdSelect, (rs, rowNum) -> {
-            return rs.getInt("id");
-        }, film.getName());
+        int filmId = keyHolder.getKey().intValue();
 
         for (Genre genre : film.getGenres()) {
             String sqlGenreInsert =
-                        "INSERT INTO film_genre (film_id, genre_id) " +
-                        "VALUES (?, ?);";
+                    "INSERT INTO film_genre (film_id, genre_id) " +
+                            "VALUES (?, ?);";
 
             jdbcTemplate.update(sqlGenreInsert, filmId, genre.getId());
         }
