@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.mpa.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mpa.dao.MpaDao;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 public class MpaService {
     private final MpaDao mpaDao;
 
