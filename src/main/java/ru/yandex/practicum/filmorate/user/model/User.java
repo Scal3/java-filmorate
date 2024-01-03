@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Data
 public class User {
-    private int id;
+    private Integer id;
 
     @Email(message = "Email must be valid email address")
     private String email;
@@ -26,7 +26,10 @@ public class User {
 
     private Set<Integer> friendsIdList;
 
-    public User(String email, String login, String name, LocalDate birthday) {
+    private FriendshipStatus friendshipStatus;
+
+    public User(Integer id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
         this.email = email;
         this.login = login;
         this.name = name;
