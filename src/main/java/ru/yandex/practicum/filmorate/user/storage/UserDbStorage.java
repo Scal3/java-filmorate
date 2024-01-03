@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.user.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -112,19 +110,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean isUserFriendOfOtherUser(int userId, int expectedFriendId) {
-        String sqlQuery =
-                        "SELECT followed_user_id " +
-                        "FROM user_friend " +
-                        "WHERE following_user_id = ? " +
-                        "AND followed_user_id = ?;";
+        String sql =
+                    "SELECT CASE WHEN EXISTS " +
+                    "(SELECT 1 FROM user_friend WHERE following_user_id = ? AND followed_user_id = ?) " +
+                    "THEN 1 ELSE 0 END;";
+        Integer result = jdbcTemplate.queryForObject(sql, Integer.class, userId, expectedFriendId);
 
-        try {
-            jdbcTemplate.queryForObject(sqlQuery, new BeanPropertyRowMapper<>(Object.class), userId, expectedFriendId);
-
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        return result != null && result == 1;
     }
 
     @Override

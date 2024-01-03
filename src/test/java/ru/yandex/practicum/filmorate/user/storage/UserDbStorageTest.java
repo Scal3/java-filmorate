@@ -180,10 +180,16 @@ class UserDbStorageTest {
         storage.create(user1);
         storage.create(user2);
 
-        boolean areTheyFriends = storage.isUserFriendOfOtherUser(1, 2);
+        boolean areTheyFriendsFalse = storage.isUserFriendOfOtherUser(1, 2);
 
-        assertThat(areTheyFriends)
+        assertThat(areTheyFriendsFalse)
                 .isEqualTo(false);
+
+        storage.addFriend(1, 2, FriendshipStatus.UNAPPROVED);
+        boolean areTheyFriendsTrue = storage.isUserFriendOfOtherUser(1, 2);
+
+        assertThat(areTheyFriendsTrue)
+                .isEqualTo(true);
     }
 
     @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
