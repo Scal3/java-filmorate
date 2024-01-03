@@ -5,10 +5,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.user.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.user.model.User;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,15 +47,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> getOneById(int id) {
-        String sqlQuery =
-                        "SELECT " +
-                            "id, " +
-                            "email, " +
-                            "login, " +
-                            "user_name, " +
-                            "birthday " +
-                        "FROM filmorate_user " +
-                        "WHERE id = ?;";
+        String sqlQuery = "SELECT * FROM filmorate_user WHERE id = ?;";
 
         return jdbcTemplate.query(sqlQuery, userRowMapper, id)
                 .stream()
@@ -60,52 +56,30 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        String sqlQuery =
-                "SELECT " +
-                    "id, " +
-                    "email, " +
-                    "login, " +
-                    "user_name, " +
-                    "birthday " +
-                "FROM filmorate_user;";
+        String sqlQuery = "SELECT * FROM filmorate_user;";
 
         return jdbcTemplate.query(sqlQuery, userRowMapper);
     }
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO filmorate_user (email, login, user_name, birthday)" +
-                          "VALUES (?, ?, ?, ?);";
+        String sqlInsertUser = "INSERT INTO filmorate_user (email, login, user_name, birthday)" +
+                               "VALUES (?, ?, ?, ?);";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(
-                sql,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday()
-        );
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sqlInsertUser, new String[]{"ID"});
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            ps.setDate(4, Date.valueOf(user.getBirthday()));
 
-        String sqlQuery =
-                        "SELECT " +
-                            "id, " +
-                            "email, " +
-                            "login, " +
-                            "user_name, " +
-                            "birthday " +
-                        "FROM filmorate_user " +
-                        "WHERE email = ? " +
-                                "AND login = ? " +
-                                "AND user_name = ? " +
-                                "AND birthday = ?;";
+            return ps;
+        }, keyHolder);
 
-        return jdbcTemplate.queryForObject(
-                sqlQuery,
-                userRowMapper,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday()
-        );
+        int userId = keyHolder.getKey().intValue();
+
+        return getOneById(userId).get();
     }
 
     @Override
